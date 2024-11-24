@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void sort(char* lines[], int counter_str);
+int my_strcmp(char* lines1,char* lines2);
+
+int main()
+{
+    FILE* file = fopen("onesha.txt", "r");
+
+    fseek(file, 0L, SEEK_END);
+    int size_file = ftell(file);
+    fseek(file, 0L, SEEK_SET);
+
+    char* onegin = (char*) calloc(size_file, sizeof(char));
+
+    fread(onegin, sizeof(char), size_file, file);
+    fclose(file);
+
+    int counter_str = 0;
+    for (int i = 0; i < size_file; i++)
+    {
+        if (onegin[i] == '\r')
+        {
+            onegin[i] = '\0';
+        }
+        if (onegin[i] == '\n')
+        {
+            counter_str++;
+            onegin[i] = '\0';
+        }
+    }
+
+    char** lines = (char**) calloc(counter_str, sizeof(char*));
+
+    int index = 0;
+    lines[index] = onegin;
+    index++;
+
+    for (int i = 0; i < size_file; i++)
+    {
+        if (onegin[i] == '\0' && i + 1 < size_file && onegin[i + 1] != '\0')
+        {
+            lines[index] = &onegin[i + 1];
+            index++;
+        }
+    }
+
+    sort(lines, counter_str);
+    for (int i = 0; i < counter_str; i++)
+    {
+        printf("%s\n", lines[i]);
+    }
+
+    free(lines);
+    free(onegin);
+
+}
+
+void sort(char* lines[], int counter_str)
+{
+    for (int j = 0; j < counter_str; j++)
+    {
+        for (int i = 0; i < counter_str - 1; i++)
+        {
+            if  (my_strcmp(lines[i], lines[j]) > 0)
+            {
+                    char* tmp = lines[i];
+                                lines[i] = lines[j];
+                                           lines[j] = tmp;
+            }
+        }
+    }
+}
+
+int my_strcmp(char*lines1, char * lines2)
+{
+    for (int i = 0; i < strlen(lines1) && i < strlen(lines2); i++)
+    {
+        if (lines1[i] > lines2[i])
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+}
